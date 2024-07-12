@@ -7,6 +7,12 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <uses-feature android:name="android.hardware.camera" />
+    <uses-feature android:name="android.hardware.camera.autofocus" />
+    <uses-feature android:name="android.hardware.camera.any" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
 
     <application
@@ -28,15 +34,19 @@
 
         <activity
             android:name=".ConversationPage"
-            android:exported="false" >
-
-
-
-        </activity>
+            android:exported="false"/>
+        <activity
+            android:name=".MainActivity"
+            android:exported="false"/>
+        <activity
+            android:name=".MainActivity2"
+            android:exported="false"/>
 
         <activity
             android:name=".MainPageBlind"
-            android:exported="false" />
+            android:exported="false" >
+
+        </activity>
 
         <activity
             android:name=".MainPageDeaf"

@@ -65,6 +65,8 @@ public class PersonalisationPage extends AppCompatActivity implements TextToSpee
 
     private TextToSpeech textToSpeech;
     private boolean isTTSInitialized = false;
+    private SharedPreferences.Editor editor;
+    private SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +79,9 @@ public class PersonalisationPage extends AppCompatActivity implements TextToSpee
             return insets;
         });
 
+        sharedPreferences = getSharedPreferences("data", MODE_PRIVATE);
+        editor = sharedPreferences.edit();
+
         ImageView mainLogo = findViewById(R.id.main_logo);
         ConstraintLayout mainCons = findViewById(R.id.main_cons);
         Animation popIn = AnimationUtils.loadAnimation(this, R.anim.pop_in);
@@ -88,6 +93,8 @@ public class PersonalisationPage extends AppCompatActivity implements TextToSpee
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
+                editor.putString("nickname", null);
+                editor.apply();
                 mainLogo.setVisibility(View.VISIBLE);
                 mainLogo.startAnimation(popIn);
                 }
@@ -141,9 +148,6 @@ public class PersonalisationPage extends AppCompatActivity implements TextToSpee
                 EditText inputName = findViewById(R.id.input_name);
                 String nickName = inputName.getText().toString();
 
-                SharedPreferences sharedPreferences = getSharedPreferences("data", MODE_PRIVATE);
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-
                 editor.putString("nickname", nickName);
                 editor.apply();
                 Intent intent = new Intent(PersonalisationPage.this, MainPageDeaf.class);
@@ -171,17 +175,26 @@ public class PersonalisationPage extends AppCompatActivity implements TextToSpee
             speechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
             speechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
 
-            if (isTTSInitialized) {
+            String nickname = sharedPreferences.getString("nickname", null);
+
+            if (isTTSInitialized && nickname == null) {
                 speak("Hello, I'm Abled, how may I call you?");
-            } else {
-                Toast.makeText(this, "Text-to-Speech not initialized", Toast.LENGTH_SHORT).show();
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        startListening(resultText, 0);
+                    }
+                }, 1000);
+            } else if (isTTSInitialized && nickname != null) {
+                speak("yes, or no?");
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        startListening(resultText, 1);
+                    }
+                }, 1000);
             }
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    startListening(resultText, 0);
-                }
-            }, 1000);
+
 
         });
 
@@ -193,6 +206,21 @@ public class PersonalisationPage extends AppCompatActivity implements TextToSpee
         screenTrigger.setOnClickListener(v -> {
             startListening(resultText, 0);
         });
+    }
+
+    @Override
+    public void onInit(int status) {
+        if (status == TextToSpeech.SUCCESS) {
+            int result = textToSpeech.setLanguage(Locale.US);
+
+            if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                Toast.makeText(this, "Language not supported", Toast.LENGTH_SHORT).show();
+            } else {
+                isTTSInitialized = true;
+            }
+        } else {
+            Toast.makeText(this, "Initialization failed", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
@@ -249,11 +277,23 @@ public class PersonalisationPage extends AppCompatActivity implements TextToSpee
                     if (isTTSInitialized) {
                         speak("Sorry, can you repeat what you said?");
                     }
-                    startListening(panel, 0);
-                    if (type == 1){
-                        if (isTTSInitialized) {
-                            speak("ya, or no?");
-                        }
+                    String nickname = sharedPreferences.getString("nickname", null);
+                    if (isTTSInitialized && nickname == null) {
+                        speak("Hello, I'm Abled, how may I call you?");
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                startListening(resultText, 0);
+                            }
+                        }, 1000);
+                    } else if (isTTSInitialized && nickname != null) {
+                        speak("yes, or no?");
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                startListening(resultText, 1);
+                            }
+                        }, 1000);
                     }
                 }
 
@@ -264,6 +304,8 @@ public class PersonalisationPage extends AppCompatActivity implements TextToSpee
                         if (type == 0){
                             userName = matches.get(0);
                             panel.setText(userName);
+                            editor.putString("nickname", userName);
+                            editor.apply();
 
                             if (isTTSInitialized) {
                                 speak("I can call you "+ userName +", is that right?");
@@ -272,16 +314,21 @@ public class PersonalisationPage extends AppCompatActivity implements TextToSpee
                             startListening(panel, 1);
                         }else if (type == 1){
                             panel.setText(matches.get(0));
-                            if(matches.get(0).equals("ya")){
+                            String compare = matches.get(0).toString().toLowerCase().trim();
+                            if(compare.equals("yes")){
                                 if (isTTSInitialized) {
                                     speak("nice to meet you "+ userName +", I hope you have a wonderful day");
                                 }
                                 Intent intent = new Intent(PersonalisationPage.this, MainPageBlind.class);
                                 startActivity(intent);
                             } else if (matches.get(0).equals("no")) {
-                                if (isTTSInitialized) {
-                                    speak("Sorry, can you repeat what you said?");
-                                }
+                                speak("sorry, so what can I call you");
+                                new Handler().postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        startListening(resultText, 0);
+                                    }
+                                }, 1000);
                             }
                         }
                     }
@@ -314,7 +361,11 @@ public class PersonalisationPage extends AppCompatActivity implements TextToSpee
     }
 
     private void speak(String text) {
-        textToSpeech.speak(text, TextToSpeech.QUEUE_FLUSH, null, null);
+        if (isTTSInitialized) {
+            textToSpeech.speak(text, TextToSpeech.QUEUE_FLUSH, null, null);
+        } else {
+            Log.e("TTS", "TextToSpeech not initialized");
+        }
     }
 
     @Override
@@ -329,19 +380,5 @@ public class PersonalisationPage extends AppCompatActivity implements TextToSpee
         }
     }
 
-    @Override
-    public void onInit(int status) {
-        if (status == TextToSpeech.SUCCESS) {
-            int result = textToSpeech.setLanguage(Locale.US);
 
-            if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                Toast.makeText(this, "Language not supported", Toast.LENGTH_SHORT).show();
-            } else {
-                isTTSInitialized = true;
-                // Text-to-Speech is now ready to be used.
-            }
-        } else {
-            Toast.makeText(this, "Initialization failed", Toast.LENGTH_SHORT).show();
-        }
-    }
 }
