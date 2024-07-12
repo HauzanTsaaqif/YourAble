@@ -8,4 +8,97 @@
     android:background="@color/white"
     tools:context=".ConversationPage">
 
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/navbar"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:background="@drawable/headbar_bg"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintVertical_bias="0">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Conversation Detected"
+            android:fontFamily="@font/roboto_bold"
+            android:textColor="@color/white"
+            android:textSize="28sp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintVertical_bias="0.4"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <ScrollView
+        android:id="@+id/scrollMonitoring"
+        android:layout_width="match_parent"
+        android:layout_height="500dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        app:layout_constraintBottom_toTopOf="@+id/footbar"
+        app:layout_constraintTop_toBottomOf="@+id/navbar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintVertical_bias="0.05"
+        android:layout_marginTop="15dp">
+
+        <RelativeLayout
+            android:id="@+id/scrollChat"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+        </RelativeLayout>
+
+    </ScrollView>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/footbar"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintVertical_bias="0"
+        android:paddingBottom="10dp"
+        android:paddingTop="10dp"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp">
+
+        <Button
+            android:id="@+id/back_btn"
+            android:layout_width="150dp"
+            android:layout_height="match_parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toLeftOf="@+id/trigger_btn"
+            app:layout_constraintLeft_toLeftOf="parent"
+            android:background="@drawable/stop_btn"
+            android:layout_margin="10dp"
+            android:text="Kembali"
+            android:fontFamily="@font/roboto_medium"
+            android:textSize="20sp"
+            android:textColor="@color/black"/>
+
+        <Button
+            android:id="@+id/trigger_btn"
+            android:layout_width="150dp"
+            android:layout_height="match_parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintLeft_toRightOf="@+id/back_btn"
+            android:background="@drawable/start_btn"
+            android:layout_margin="10dp"
+            android:text="Start"
+            android:fontFamily="@font/roboto_medium"
+            android:textSize="20sp"
+            android:textColor="@color/black"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

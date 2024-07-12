@@ -23,11 +23,16 @@
         <service
             android:name=".AudioRecordingService"
             android:foregroundServiceType="microphone" />
+
         <receiver android:name=".NotificationAction" />
 
         <activity
             android:name=".ConversationPage"
-            android:exported="false" />
+            android:exported="false" >
+
+
+
+        </activity>
 
         <activity
             android:name=".MainPageBlind"
@@ -35,16 +40,17 @@
 
         <activity
             android:name=".MainPageDeaf"
+            android:exported="false">
+        </activity>
+
+        <activity
+            android:name=".PersonalisationPage"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <activity
-            android:name=".PersonalisationPage"
-            android:exported="false"></activity>
 
         <meta-data
             android:name="preloaded_fonts"
